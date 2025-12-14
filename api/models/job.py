@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
+from django.db.models import Value
 
 
 class Job(models.Model):
@@ -31,3 +32,13 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+
+    def update_search_vector(self):
+        skills_text = ' '.join(self.skills.values_list('name', flat=True))
+        Job.objects.filter(pk=self.pk).update(
+            search_vector=(
+                SearchVector('title', weight='A') +
+                SearchVector('description', weight='B') +
+                SearchVector(Value(skills_text), weight='B')
+            )
+        )
