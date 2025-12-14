@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from api.filters import JobFilter
 from api.models import Job
-from api.serializers.job import JobListSerializer
+from api.serializers.job import JobListSerializer, JobDetailSerializer
 
 
 class JobPagination(PageNumberPagination):
@@ -19,3 +19,9 @@ class JobListView(generics.ListAPIView):
     # pagination_class = JobPagination
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = JobFilter
+
+
+class JobDetailView(generics.RetrieveAPIView):
+    queryset = Job.objects.select_related('organization', 'country').prefetch_related('skills')
+    serializer_class = JobDetailSerializer
+    lookup_field = 'id'
