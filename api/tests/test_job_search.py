@@ -13,13 +13,15 @@ class JobSearchFilterTests(JobAPITestCase):
         response = self.client.get(self.url, {'q': 'Python', 'country': 'USA'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(response.data), 2)
+        results = response.data['results']
+        self.assertGreaterEqual(len(results), 2)
         
-        for job in response.data:
+        # Verify country filter works for all results
+        for job in results:
             self.assertEqual(job['country'], 'USA')
 
         # Assert relevance of search results
-        ids = [job['id'] for job in response.data]
+        ids = [job['id'] for job in results]
         
         index_job1 = ids.index('1')
         index_job3 = ids.index('3')
@@ -30,4 +32,5 @@ class JobSearchFilterTests(JobAPITestCase):
         response = self.client.get(self.url, {'q': 'NonExistentTechnology12345'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
+        results = response.data['results']
+        self.assertEqual(len(results), 0)

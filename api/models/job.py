@@ -37,8 +37,8 @@ class Job(models.Model):
         skills_text = ' '.join(self.skills.values_list('name', flat=True))
         Job.objects.filter(pk=self.pk).update(
             search_vector=(
-                SearchVector('title', weight='A') +
-                SearchVector('description', weight='B') +
-                SearchVector(Value(skills_text), weight='B')
+                SearchVector('title', weight='A', config='simple') +
+                SearchVector('description', weight='B', config='simple') +
+                SearchVector(Value(skills_text), weight='B', config='simple')
             )
         )

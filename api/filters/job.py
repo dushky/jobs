@@ -17,7 +17,8 @@ class JobFilter(filters.FilterSet):
         if not value:
             return queryset
 
-        query = SearchQuery(value.strip())
+        # Use config='simple' for exact matching (no stemming)
+        query = SearchQuery(value.strip(), config='simple')
         return queryset.filter(search_vector=query).annotate(
             rank=SearchRank(F('search_vector'), query)
         )
